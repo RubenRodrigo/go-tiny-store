@@ -65,9 +65,9 @@ func (h *AuthHandler) LoginUser(w http.ResponseWriter, r *http.Request) error {
 		return apperrors.ErrRequestInvalidBody
 	}
 
-	// Basic validation
-	if req.Email == "" || req.Password == "" {
-		return apperrors.ErrAuthRequiredFields
+	// Validate the request
+	if validationErrors := lib.Validate(req); len(validationErrors.Errors) > 0 {
+		return validationErrors
 	}
 
 	user, token, err := h.authService.LoginUser(

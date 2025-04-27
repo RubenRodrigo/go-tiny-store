@@ -27,9 +27,6 @@ func DefaultErrorHandler(err error) (int, interface{}) {
 	case errors.Is(err, apperrors.ErrAuthInvalidCredentials):
 		return http.StatusBadRequest, map[string]string{"error": "Invalid Credentials"}
 
-	case errors.Is(err, apperrors.ErrAuthRequiredFields):
-		return http.StatusBadRequest, map[string]string{"error": "Invalid request. Email and password are required"}
-
 	case errors.Is(err, apperrors.ErrUserEmailExists):
 		return http.StatusBadRequest, map[string]string{"error": "This user already exists"}
 
