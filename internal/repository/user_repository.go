@@ -23,7 +23,7 @@ func (r *userRepository) CreateUser(user *models.User) error {
 	if err != nil {
 		if errors.Is(err, gorm.ErrDuplicatedKey) {
 			if strings.Contains(err.Error(), "email") {
-				return apperrors.ErrAuthEmailExists
+				return apperrors.ErrUserEmailExists
 			}
 
 			return apperrors.ErrDuplicateEntry

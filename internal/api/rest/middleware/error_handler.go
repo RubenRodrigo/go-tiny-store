@@ -10,26 +10,35 @@ import (
 )
 
 // ErrorHandlerFunc is a type that handles errors and returns HTTP responses
-type ErrorHandlerFunc func(err error) (int, string)
+type ErrorHandlerFunc func(err error) (int, interface{})
 
 // DefaultErrorHandler maps common service errors to HTTP responses
-func DefaultErrorHandler(err error) (int, string) {
+func DefaultErrorHandler(err error) (int, interface{}) {
+	// Check if it's a validation error first
+	var validationErrors *apperrors.ValidationErrors
+	if errors.As(err, &validationErrors) {
+		return http.StatusBadRequest, *validationErrors
+	}
+
 	switch {
 	case errors.Is(err, apperrors.ErrUserNotFound):
-		return http.StatusNotFound, "Resource not found"
+		return http.StatusNotFound, map[string]string{"error": "Resource not found"}
 
 	case errors.Is(err, apperrors.ErrAuthInvalidCredentials):
-		return http.StatusBadRequest, "Invalid Credentials"
+		return http.StatusBadRequest, map[string]string{"error": "Invalid Credentials"}
 
-	case errors.Is(err, apperrors.ErrAuthEmailExists):
-		return http.StatusBadRequest, "This user already exists"
+	case errors.Is(err, apperrors.ErrAuthRequiredFields):
+		return http.StatusBadRequest, map[string]string{"error": "Invalid request. Email and password are required"}
+
+	case errors.Is(err, apperrors.ErrUserEmailExists):
+		return http.StatusBadRequest, map[string]string{"error": "This user already exists"}
 
 	case errors.Is(err, apperrors.ErrDatabaseError):
-		return http.StatusInternalServerError, "Internal server error"
+		return http.StatusInternalServerError, map[string]string{"error": "Internal server error"}
 
 	// Add other error mappings as needed
 	default:
-		return http.StatusInternalServerError, "Unexpected error"
+		return http.StatusInternalServerError, map[string]string{"error": "Unexpected error"}
 	}
 }
 

@@ -34,7 +34,7 @@ func (s *authService) RegisterUser(email, username, password, firstName, lastNam
 	}
 
 	if existingUser != nil {
-		return nil, apperrors.ErrAuthEmailExists
+		return nil, apperrors.ErrUserEmailExists
 	}
 
 	// Hash the password

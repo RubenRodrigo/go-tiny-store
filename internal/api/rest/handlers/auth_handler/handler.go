@@ -7,6 +7,7 @@ import (
 	"github.com/RubenRodrigo/go-tiny-store/internal/api/rest/httputil"
 	"github.com/RubenRodrigo/go-tiny-store/internal/api/rest/middleware"
 	"github.com/RubenRodrigo/go-tiny-store/internal/apperrors"
+	"github.com/RubenRodrigo/go-tiny-store/internal/lib"
 	"github.com/RubenRodrigo/go-tiny-store/internal/service"
 )
 
@@ -28,9 +29,9 @@ func (h *AuthHandler) RegisterUser(w http.ResponseWriter, r *http.Request) error
 		return apperrors.ErrRequestInvalidBody
 	}
 
-	// Basic validation
-	if req.Email == "" || req.Username == "" || req.Password == "" {
-		return apperrors.ErrAuthRequiredFields
+	// Validate the request
+	if validationErrors := lib.Validate(req); len(validationErrors.Errors) > 0 {
+		return validationErrors
 	}
 
 	user, err := h.authService.RegisterUser(

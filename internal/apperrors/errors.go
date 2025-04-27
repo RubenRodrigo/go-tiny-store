@@ -10,12 +10,12 @@ var (
 
 // User related errors
 var (
-	ErrUserNotFound = errors.New("user not found")
+	ErrUserNotFound    = errors.New("user not found")
+	ErrUserEmailExists = errors.New("user with this email already exists")
 )
 
 // Authentication errors
 var (
-	ErrAuthEmailExists        = errors.New("user with this email already exists")
 	ErrAuthInvalidCredentials = errors.New("invalid credentials")
 	ErrAuthUnauthorized       = errors.New("unauthorized access")
 	ErrAuthTokenExpired       = errors.New("token has expired")
