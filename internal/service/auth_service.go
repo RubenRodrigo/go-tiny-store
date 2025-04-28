@@ -24,6 +24,29 @@ func NewAuthService(userRepo repository.UserRepository, jwtSecret string) AuthSe
 	}
 }
 
+// generateJWT creates a new JWT token for the authenticated user
+func (s *authService) generateJWT(user *models.User) (string, error) {
+	// Create claims with user information
+	claims := jwt.MapClaims{
+		"user_id":  user.ID,
+		"email":    user.Email,
+		"username": user.Username,
+		"exp":      time.Now().Add(time.Hour * 24).Unix(), // Token expires in 24 hours
+	}
+
+	// Create token with claims
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	// Sign the token with the secret key
+	tokenString, err := token.SignedString(s.jwtSecret)
+	if err != nil {
+		log.Println("ERROR: Failed to generate token: %w", err)
+		return "", err
+	}
+
+	return tokenString, nil
+}
+
 func (s *authService) RegisterUser(email, username, password, firstName, lastName string) (*models.User, error) {
 	// Check if user with email already exists
 	existingUser, err := s.userRepo.GetUserByEmail(email)
@@ -88,25 +111,7 @@ func (s *authService) LoginUser(email, password string) (*models.User, string, e
 	return user, token, nil
 }
 
-// generateJWT creates a new JWT token for the authenticated user
-func (s *authService) generateJWT(user *models.User) (string, error) {
-	// Create claims with user information
-	claims := jwt.MapClaims{
-		"user_id":  user.ID,
-		"email":    user.Email,
-		"username": user.Username,
-		"exp":      time.Now().Add(time.Hour * 24).Unix(), // Token expires in 24 hours
-	}
-
-	// Create token with claims
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-
-	// Sign the token with the secret key
-	tokenString, err := token.SignedString(s.jwtSecret)
-	if err != nil {
-		log.Println("ERROR: Failed to generate token: %w", err)
-		return "", err
-	}
-
-	return tokenString, nil
+// LogOutUser implements AuthService.
+func (s *authService) LogOutUser(token string) error {
+	return nil
 }

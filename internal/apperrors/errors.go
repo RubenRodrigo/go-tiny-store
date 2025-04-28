@@ -20,6 +20,7 @@ var (
 	ErrAuthUnauthorized       = errors.New("unauthorized access")
 	ErrAuthTokenExpired       = errors.New("token has expired")
 	ErrAuthTokenGenerated     = errors.New("failed to generate token")
+	ErrAuthTokenInvalid       = errors.New("invalid token")
 )
 
 // Request errors

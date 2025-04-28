@@ -91,3 +91,28 @@ func (h *AuthHandler) LoginUser(w http.ResponseWriter, r *http.Request) error {
 
 	return nil
 }
+
+// TODO: Pending to implement
+func (h *AuthHandler) LogOutUser(w http.ResponseWriter, r *http.Request) error {
+	var req LogOutUserRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		return apperrors.ErrRequestInvalidBody
+	}
+
+	// Validate the request
+	if validationErrors := lib.Validate(req); len(validationErrors.Errors) > 0 {
+		return validationErrors
+	}
+
+	err := h.authService.LogOutUser(
+		req.Token,
+	)
+
+	if err != nil {
+		return apperrors.ErrAuthTokenInvalid
+	}
+
+	httputil.RespondWithJSON(w, http.StatusOK, nil)
+
+	return nil
+}

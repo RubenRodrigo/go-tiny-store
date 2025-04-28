@@ -24,31 +24,13 @@ func SetupRoutes(auth_handler *auth_handler.AuthHandler, user_handler *user_hand
 	// Public routes
 	api.HandleFunc("/auth/register", middleware.WithErrorHandling(auth_handler.RegisterUser, auth_handler.ErrorHandler)).Methods("POST")
 	api.HandleFunc("/auth/login", middleware.WithErrorHandling(auth_handler.LoginUser, auth_handler.ErrorHandler)).Methods("POST")
+	api.HandleFunc("/auth/logout", middleware.WithErrorHandling(auth_handler.LogOutUser, auth_handler.ErrorHandler)).Methods("POST")
 	api.HandleFunc("/users/{id}", middleware.WithErrorHandling(user_handler.GetUser, user_handler.ErrorHandler)).Methods("GET")
 	api.HandleFunc("/users", middleware.WithErrorHandling(user_handler.ListUsers, user_handler.ErrorHandler)).Methods("GET")
 
 	// Add middleware
-	r.Use(loggingMiddleware)
-	r.Use(recoveryMiddleware)
+	r.Use(middleware.LoggingMiddleware)
+	r.Use(middleware.RecoveryMiddleware)
 
 	return r
-}
-
-// Middleware implementations
-func loggingMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Log request info
-		next.ServeHTTP(w, r)
-	})
-}
-
-func recoveryMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		defer func() {
-			if err := recover(); err != nil {
-				http.Error(w, "Internal server error", http.StatusInternalServerError)
-			}
-		}()
-		next.ServeHTTP(w, r)
-	})
 }

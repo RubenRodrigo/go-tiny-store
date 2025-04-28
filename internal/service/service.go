@@ -12,4 +12,5 @@ type UserService interface {
 type AuthService interface {
 	RegisterUser(email, username, password, firstName, lastName string) (*models.User, error)
 	LoginUser(email, password string) (*models.User, string, error)
+	LogOutUser(token string) error
 }
