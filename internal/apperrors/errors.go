@@ -16,11 +16,14 @@ var (
 
 // Authentication errors
 var (
-	ErrAuthInvalidCredentials = errors.New("invalid credentials")
-	ErrAuthUnauthorized       = errors.New("unauthorized access")
-	ErrAuthTokenExpired       = errors.New("token has expired")
-	ErrAuthTokenGenerated     = errors.New("failed to generate token")
-	ErrAuthTokenInvalid       = errors.New("invalid token")
+	ErrAuthInvalidCredentials  = errors.New("invalid credentials")
+	ErrAuthUnauthorized        = errors.New("unauthorized access")
+	ErrAuthTokenGenerated      = errors.New("failed to generate token")
+	ErrAuthTokenInvalid        = errors.New("invalid auth token")
+	ErrAuthMissingToken        = errors.New("missing authorization token")
+	ErrAuthInvalidTokenFormat  = errors.New("invalid token format")
+	ErrAuthTokenExpired        = errors.New("auth token expired")
+	ErrInsufficientPermissions = errors.New("insufficient permissions")
 )
 
 // Request errors

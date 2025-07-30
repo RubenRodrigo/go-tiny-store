@@ -4,6 +4,7 @@ import (
 	"github.com/RubenRodrigo/go-tiny-store/internal/api/rest"
 	"github.com/RubenRodrigo/go-tiny-store/internal/config"
 	"github.com/RubenRodrigo/go-tiny-store/internal/db"
+	"github.com/RubenRodrigo/go-tiny-store/internal/lib"
 	"github.com/RubenRodrigo/go-tiny-store/internal/repository"
 	"github.com/RubenRodrigo/go-tiny-store/internal/service"
 )
@@ -28,15 +29,18 @@ func (a *App) Initialize() error {
 		return err
 	}
 
+	// Initialize Create JWT manager
+	jwtManager := lib.NewJWTManager([]byte(a.config.Auth.JWT_SECRET))
+
 	// Initialize repositories
 	userRepo := repository.NewUserRepository(database)
 
 	// Initialize services
-	userService := service.NewUserService(userRepo, "JWT_SECRET")
-	authService := service.NewAuthService(userRepo, "JWT_SECRET")
+	userService := service.NewUserService(userRepo)
+	authService := service.NewAuthService(userRepo, jwtManager)
 
 	// Initialize REST server
-	a.restServer = rest.NewServer(userService, authService, &a.config.Server)
+	a.restServer = rest.NewServer(userService, authService, &a.config.Server, jwtManager)
 
 	return nil
 }

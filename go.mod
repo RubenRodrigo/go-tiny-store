@@ -3,6 +3,7 @@ module github.com/RubenRodrigo/go-tiny-store
 go 1.24.0
 
 require (
+	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/golang-jwt/jwt/v5 v5.2.2 // indirect
 	github.com/gorilla/mux v1.8.1 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect

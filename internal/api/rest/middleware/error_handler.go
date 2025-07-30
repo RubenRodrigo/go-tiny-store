@@ -10,10 +10,10 @@ import (
 )
 
 // ErrorHandlerFunc is a type that handles errors and returns HTTP responses
-type ErrorHandlerFunc func(err error) (int, interface{})
+type ErrorHandlerFunc func(r *http.Request, err error) (int, interface{})
 
 // DefaultErrorHandler maps common service errors to HTTP responses
-func DefaultErrorHandler(err error) (int, interface{}) {
+func DefaultErrorHandler(r *http.Request, err error) (int, interface{}) {
 	// Check if it's a validation error first
 	var validationErrors *apperrors.ValidationErrors
 	if errors.As(err, &validationErrors) {
@@ -39,12 +39,31 @@ func DefaultErrorHandler(err error) (int, interface{}) {
 	}
 }
 
+// AuthErrorHandler handles authentication-specific errors
+func AuthErrorHandler(r *http.Request, err error) (int, interface{}) {
+	switch {
+	case errors.Is(err, apperrors.ErrAuthMissingToken):
+		return http.StatusUnauthorized, map[string]string{"error": "Authorization token required"}
+	case errors.Is(err, apperrors.ErrAuthInvalidTokenFormat):
+		return http.StatusUnauthorized, map[string]string{"error": "Authorization header format must be 'Bearer {token}'"}
+	case errors.Is(err, apperrors.ErrAuthTokenInvalid):
+		return http.StatusUnauthorized, map[string]string{"error": "Invalid or malformed token"}
+	case errors.Is(err, apperrors.ErrAuthTokenExpired):
+		return http.StatusUnauthorized, map[string]string{"error": "Token has expired"}
+	case errors.Is(err, apperrors.ErrInsufficientPermissions):
+		return http.StatusForbidden, map[string]string{"error": "Insufficient permissions"}
+	default:
+		// Fall back to default error handler for non-auth errors
+		return DefaultErrorHandler(r, err)
+	}
+}
+
 // WithErrorHandling wraps a handler function that returns an error
 func WithErrorHandling(handler func(w http.ResponseWriter, r *http.Request) error, errorHandler ErrorHandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		err := handler(w, r)
 		if err != nil {
-			status, message := errorHandler(err)
+			status, message := errorHandler(r, err)
 			httputil.RespondWithError(w, status, message)
 		}
 	}

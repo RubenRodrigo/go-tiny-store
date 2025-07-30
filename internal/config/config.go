@@ -11,6 +11,7 @@ import (
 type Config struct {
 	Server   ServerConfig
 	Database DatabaseConfig
+	Auth     AuthConfig
 }
 
 type ServerConfig struct {
@@ -25,6 +26,10 @@ type DatabaseConfig struct {
 	Password string
 	Name     string
 	SSLMode  string
+}
+
+type AuthConfig struct {
+	JWT_SECRET string
 }
 
 func Load() *Config {
@@ -45,6 +50,9 @@ func Load() *Config {
 			Password: getEnv("DB_PASSWORD", "postgres"),
 			Name:     getEnv("DB_NAME", "myproject"),
 			SSLMode:  getEnv("DB_SSLMODE", "disable"),
+		},
+		Auth: AuthConfig{
+			JWT_SECRET: getEnv("JWT_SECRET", "JWT_SECRET"),
 		},
 	}
 }

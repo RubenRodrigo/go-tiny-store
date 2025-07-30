@@ -3,48 +3,24 @@ package service
 import (
 	"errors"
 	"log"
-	"time"
 
 	"github.com/RubenRodrigo/go-tiny-store/internal/apperrors"
+	"github.com/RubenRodrigo/go-tiny-store/internal/lib"
 	"github.com/RubenRodrigo/go-tiny-store/internal/models"
 	"github.com/RubenRodrigo/go-tiny-store/internal/repository"
-	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type authService struct {
-	userRepo  repository.UserRepository
-	jwtSecret []byte
+	userRepo   repository.UserRepository
+	jwtManager *lib.JWTManager
 }
 
-func NewAuthService(userRepo repository.UserRepository, jwtSecret string) AuthService {
+func NewAuthService(userRepo repository.UserRepository, jwtManager *lib.JWTManager) AuthService {
 	return &authService{
-		userRepo:  userRepo,
-		jwtSecret: []byte(jwtSecret),
+		userRepo:   userRepo,
+		jwtManager: jwtManager,
 	}
-}
-
-// generateJWT creates a new JWT token for the authenticated user
-func (s *authService) generateJWT(user *models.User) (string, error) {
-	// Create claims with user information
-	claims := jwt.MapClaims{
-		"user_id":  user.ID,
-		"email":    user.Email,
-		"username": user.Username,
-		"exp":      time.Now().Add(time.Hour * 24).Unix(), // Token expires in 24 hours
-	}
-
-	// Create token with claims
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-
-	// Sign the token with the secret key
-	tokenString, err := token.SignedString(s.jwtSecret)
-	if err != nil {
-		log.Println("ERROR: Failed to generate token: %w", err)
-		return "", err
-	}
-
-	return tokenString, nil
 }
 
 func (s *authService) RegisterUser(email, username, password, firstName, lastName string) (*models.User, error) {
@@ -103,7 +79,7 @@ func (s *authService) LoginUser(email, password string) (*models.User, string, e
 	}
 
 	// Generate JWT token
-	token, err := s.generateJWT(user)
+	token, err := s.jwtManager.GenerateToken(user.ID, user.Email, user.Username)
 	if err != nil {
 		return nil, "", apperrors.ErrAuthTokenGenerated
 	}

@@ -9,6 +9,7 @@ import (
 	"github.com/RubenRodrigo/go-tiny-store/internal/api/rest/handlers/user_handler"
 	"github.com/RubenRodrigo/go-tiny-store/internal/api/rest/routes"
 	"github.com/RubenRodrigo/go-tiny-store/internal/config"
+	"github.com/RubenRodrigo/go-tiny-store/internal/lib"
 	"github.com/RubenRodrigo/go-tiny-store/internal/service"
 	"github.com/gorilla/mux"
 )
@@ -18,14 +19,18 @@ type Server struct {
 	userService service.UserService
 	authService service.AuthService
 	config      *config.ServerConfig
+	jwtManager  *lib.JWTManager  // Add this
+
 }
 
-func NewServer(userService service.UserService, authService service.AuthService, cfg *config.ServerConfig) *Server {
+func NewServer(userService service.UserService, authService service.AuthService, cfg *config.ServerConfig, jwtManager *lib.JWTManager) *Server {
 	server := &Server{
 		router:      mux.NewRouter(),
 		userService: userService,
 		authService: authService,
 		config:      cfg,
+		jwtManager:  jwtManager,  // Store JWT manager
+
 	}
 
 	server.setupRoutes()
@@ -35,7 +40,7 @@ func NewServer(userService service.UserService, authService service.AuthService,
 func (s *Server) setupRoutes() {
 	auth_handler := auth_handler.NewAuthHandler(s.authService)
 	user_handler := user_handler.NewUserHandler(s.userService)
-	s.router = routes.SetupRoutes(auth_handler, user_handler)
+	s.router = routes.SetupRoutes(auth_handler, user_handler, s.jwtManager)
 }
 
 func (s *Server) Start() error {
