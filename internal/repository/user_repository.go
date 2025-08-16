@@ -42,7 +42,7 @@ func (r *userRepository) GetUserByEmail(email string) (*models.User, error) {
 	var user models.User
 	if err := r.db.Where("email = ?", email).First(&user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, apperrors.ErrUserNotFound
+			return nil, apperrors.ErrNotFound
 		}
 
 		log.Printf("ERROR: Failed to read user in database. Email: %s, Error: %v",
@@ -58,7 +58,7 @@ func (r *userRepository) GetUserById(id string) (*models.User, error) {
 	var user models.User
 	if err := r.db.Where("id = ?", id).First(&user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, apperrors.ErrUserNotFound
+			return nil, apperrors.ErrNotFound
 		}
 
 		log.Printf("ERROR: Failed to read user in database. Id: %s, Error: %v",

@@ -27,7 +27,7 @@ func (s *authService) RegisterUser(email, username, password, firstName, lastNam
 	// Check if user with email already exists
 	existingUser, err := s.userRepo.GetUserByEmail(email)
 	if err != nil {
-		if !errors.Is(err, apperrors.ErrUserNotFound) {
+		if !errors.Is(err, apperrors.ErrNotFound) {
 			return nil, err
 		}
 	}
@@ -65,7 +65,7 @@ func (s *authService) LoginUser(email, password string) (*models.User, string, e
 	// Check if user with email already exists
 	user, err := s.userRepo.GetUserByEmail(email)
 	if err != nil {
-		if errors.Is(err, apperrors.ErrUserNotFound) {
+		if errors.Is(err, apperrors.ErrNotFound) {
 			return nil, "", apperrors.ErrAuthInvalidCredentials
 		}
 

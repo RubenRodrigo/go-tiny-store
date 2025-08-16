@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/RubenRodrigo/go-tiny-store/internal/api/rest/handlers/auth_handler"
+	"github.com/RubenRodrigo/go-tiny-store/internal/api/rest/handlers/category_handler"
 	"github.com/RubenRodrigo/go-tiny-store/internal/api/rest/handlers/user_handler"
 	"github.com/RubenRodrigo/go-tiny-store/internal/api/rest/routes"
 	"github.com/RubenRodrigo/go-tiny-store/internal/config"
@@ -15,22 +16,22 @@ import (
 )
 
 type Server struct {
-	router      *mux.Router
-	userService service.UserService
-	authService service.AuthService
-	config      *config.ServerConfig
-	jwtManager  *lib.JWTManager  // Add this
-
+	router          *mux.Router
+	userService     service.UserService
+	authService     service.AuthService
+	categoryService service.CategoryService
+	config          *config.ServerConfig
+	jwtManager      *lib.JWTManager
 }
 
-func NewServer(userService service.UserService, authService service.AuthService, cfg *config.ServerConfig, jwtManager *lib.JWTManager) *Server {
+func NewServer(userService service.UserService, authService service.AuthService, categoryService service.CategoryService, cfg *config.ServerConfig, jwtManager *lib.JWTManager) *Server {
 	server := &Server{
-		router:      mux.NewRouter(),
-		userService: userService,
-		authService: authService,
-		config:      cfg,
-		jwtManager:  jwtManager,  // Store JWT manager
-
+		router:          mux.NewRouter(),
+		userService:     userService,
+		authService:     authService,
+		categoryService: categoryService,
+		config:          cfg,
+		jwtManager:      jwtManager,
 	}
 
 	server.setupRoutes()
@@ -40,7 +41,9 @@ func NewServer(userService service.UserService, authService service.AuthService,
 func (s *Server) setupRoutes() {
 	auth_handler := auth_handler.NewAuthHandler(s.authService)
 	user_handler := user_handler.NewUserHandler(s.userService)
-	s.router = routes.SetupRoutes(auth_handler, user_handler, s.jwtManager)
+	category_handler := category_handler.NewCategoryHandler(s.categoryService)
+
+	s.router = routes.SetupRoutes(auth_handler, user_handler, category_handler, s.jwtManager)
 }
 
 func (s *Server) Start() error {

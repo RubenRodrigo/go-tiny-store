@@ -26,9 +26,11 @@ func SetupDatabase(cfg *config.DatabaseConfig) (*gorm.DB, error) {
 	}
 
 	// Auto migrate database schema
-	err = db.AutoMigrate(&models.User{})
+	err = db.AutoMigrate(&models.User{}, &models.Product{}, &models.Category{}, &models.ProductImage{})
 	if err != nil {
 		return nil, fmt.Errorf("failed to migrate database: %w", err)
+	} else {
+		log.Println("Database migrated successfully")
 	}
 
 	return db, nil

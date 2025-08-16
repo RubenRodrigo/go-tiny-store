@@ -21,7 +21,7 @@ func DefaultErrorHandler(r *http.Request, err error) (int, interface{}) {
 	}
 
 	switch {
-	case errors.Is(err, apperrors.ErrUserNotFound):
+	case errors.Is(err, apperrors.ErrNotFound):
 		return http.StatusNotFound, map[string]string{"error": "Resource not found"}
 
 	case errors.Is(err, apperrors.ErrAuthInvalidCredentials):
@@ -32,6 +32,9 @@ func DefaultErrorHandler(r *http.Request, err error) (int, interface{}) {
 
 	case errors.Is(err, apperrors.ErrDatabaseError):
 		return http.StatusInternalServerError, map[string]string{"error": "Internal server error"}
+
+	case errors.Is(err, apperrors.ErrRequestInvalidBody):
+		return http.StatusInternalServerError, map[string]string{"error": "Invalid request body"}
 
 	// Add other error mappings as needed
 	default:

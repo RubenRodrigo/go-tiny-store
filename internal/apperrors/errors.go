@@ -1,6 +1,8 @@
 package apperrors
 
-import "errors"
+import (
+	"errors"
+)
 
 // Common Errors
 var (
@@ -10,7 +12,6 @@ var (
 
 // User related errors
 var (
-	ErrUserNotFound    = errors.New("user not found")
 	ErrUserEmailExists = errors.New("user with this email already exists")
 )
 
@@ -29,4 +30,10 @@ var (
 // Request errors
 var (
 	ErrRequestInvalidBody = errors.New("invalid request body")
+)
+
+// Generic DB error functions
+var (
+	ErrNotFound      = errors.New("resource not found")
+	ErrAlreadyExists = errors.New("resource already exists not found")
 )

@@ -34,13 +34,15 @@ func (a *App) Initialize() error {
 
 	// Initialize repositories
 	userRepo := repository.NewUserRepository(database)
+	categoryRepo := repository.NewCategoryRepository(database)
 
 	// Initialize services
 	userService := service.NewUserService(userRepo)
 	authService := service.NewAuthService(userRepo, jwtManager)
+	categoryService := service.NewCategoryService(categoryRepo)
 
 	// Initialize REST server
-	a.restServer = rest.NewServer(userService, authService, &a.config.Server, jwtManager)
+	a.restServer = rest.NewServer(userService, authService, categoryService, &a.config.Server, jwtManager)
 
 	return nil
 }

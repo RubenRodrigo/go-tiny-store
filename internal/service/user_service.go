@@ -32,5 +32,4 @@ func (s *userService) ListUsers() ([]*models.User, error) {
 	}
 
 	return users, nil
-
 }

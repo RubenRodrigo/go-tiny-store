@@ -14,3 +14,9 @@ type AuthService interface {
 	LoginUser(email, password string) (*models.User, string, error)
 	LogOutUser(token string) error
 }
+
+type CategoryService interface {
+	List() ([]*models.Category, error)
+	Save(name string, id uint) (*models.Category, error)
+	Delete(id uint) (*models.Category, error)
+}
