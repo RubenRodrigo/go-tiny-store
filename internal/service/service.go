@@ -17,6 +17,7 @@ type AuthService interface {
 
 type CategoryService interface {
 	List() ([]*models.Category, error)
-	Save(name string, id uint) (*models.Category, error)
-	Delete(id uint) (*models.Category, error)
+	Update(name, id string) (*models.Category, error)
+	Create(name string) (*models.Category, error)
+	Delete(id string) error
 }

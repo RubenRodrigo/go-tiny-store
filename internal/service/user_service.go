@@ -16,7 +16,6 @@ func NewUserService(userRepo repository.UserRepository) UserService {
 }
 
 func (s *userService) GetUserByID(id string) (*models.User, error) {
-	// Check if user with email already exists
 	user, err := s.userRepo.GetUserById(id)
 	if err != nil {
 		return nil, err

@@ -44,7 +44,7 @@ func (j *JWTManager) ValidateToken(tokenString string) (jwt.MapClaims, error) {
 	return claims, nil
 }
 
-func (j *JWTManager) GenerateToken(userID uint, email, username string) (string, error) {
+func (j *JWTManager) GenerateToken(userID, email, username string) (string, error) {
 	claims := jwt.MapClaims{
 		"user_id":  userID,
 		"email":    email,

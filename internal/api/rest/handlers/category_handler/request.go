@@ -1,6 +1,5 @@
 package category_handler
 
-type SaveCategoryRequest struct {
-	ID   uint   `json:"id"`
+type CategoryRequest struct {
 	Name string `json:"name" validate:"required,min=0,max=100"`
 }

@@ -7,6 +7,7 @@ import (
 )
 
 func main() {
+
 	application := app.New()
 
 	if err := application.Initialize(); err != nil {

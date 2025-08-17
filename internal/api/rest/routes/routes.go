@@ -33,7 +33,8 @@ func SetupRoutes(auth_handler *auth_handler.AuthHandler, user_handler *user_hand
 	protected.Use(middleware.AuthMiddleware(jwtManager))
 	protected.HandleFunc("/users/{id}", middleware.WithErrorHandling(user_handler.GetUser, user_handler.ErrorHandler)).Methods("GET")
 	protected.HandleFunc("/users", middleware.WithErrorHandling(user_handler.ListUsers, user_handler.ErrorHandler)).Methods("GET")
-	protected.HandleFunc("/categories", middleware.WithErrorHandling(category_handler.Save, category_handler.ErrorHandler)).Methods("POST")
+	protected.HandleFunc("/categories", middleware.WithErrorHandling(category_handler.Create, category_handler.ErrorHandler)).Methods("POST")
+	protected.HandleFunc("/categories/{id}", middleware.WithErrorHandling(category_handler.Update, category_handler.ErrorHandler)).Methods("PUT")
 
 	// Add middleware
 	r.Use(middleware.LoggingMiddleware)

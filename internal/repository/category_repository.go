@@ -14,16 +14,16 @@ type categoryRepository struct {
 }
 
 // Delete implements CategoryRepository.
-func (r *categoryRepository) Delete(category *models.Category) error {
-	err := r.db.Delete(category).Error
+func (r *categoryRepository) Delete(id string) error {
+	err := r.db.Delete(&models.Category{}, id).Error
 
 	if err == nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return apperrors.ErrNotFound
 		}
 
-		log.Printf("ERROR: Failed to delete category in database. Name: %s, Error: %v",
-			category.Name, err)
+		log.Printf("ERROR: Failed to delete category in database. ID: %s, Error: %v",
+			id, err)
 
 		return apperrors.ErrDatabaseError
 	}
@@ -59,18 +59,40 @@ func (r *categoryRepository) List() ([]*models.Category, error) {
 	return categories, nil
 }
 
-func (r *categoryRepository) Save(category *models.Category) error {
-	err := r.db.Save(category).Error
+func (r *categoryRepository) Create(category *models.Category) error {
+	err := r.db.Create(category).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrDuplicatedKey) {
 			return apperrors.ErrDuplicateEntry
 		}
 
-		log.Printf("ERROR: Failed to update category in database. ID: %d, Name: %s, Error: %v",
-			category.ID, category.Name, err)
+		log.Printf("ERROR: Failed to update category in database. Name: %s, Error: %v",
+			category.Name, err)
 
 		return apperrors.ErrDatabaseError
 	}
+	return nil
+}
+
+func (r *categoryRepository) Update(id string, category *models.Category) error {
+	category.ID = id
+	result := r.db.Model(&models.Category{}).Where("id = ?", id).Updates(category)
+
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrDuplicatedKey) {
+			return apperrors.ErrDuplicateEntry
+		}
+
+		log.Printf("ERROR: Failed to update category in database. Name: %s, Error: %v",
+			category.Name, result.Error)
+
+		return apperrors.ErrDatabaseError
+	}
+
+	if result.RowsAffected == 0 {
+		return apperrors.ErrDuplicateEntry
+	}
+
 	return nil
 }
 
