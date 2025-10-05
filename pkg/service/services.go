@@ -9,7 +9,7 @@ import (
 
 type Services struct {
 	User     *user.Service
-	Auth     auth.Service
+	Auth     *auth.Service
 	Category *category.Service
 	Product  *product.Service
 }

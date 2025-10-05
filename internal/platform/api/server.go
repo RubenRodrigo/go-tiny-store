@@ -3,14 +3,15 @@ package api
 import (
 	"fmt"
 	"log"
+
 	"net/http"
 
-	authhttp "github.com/RubenRodrigo/go-tiny-store/internal/domain/auth/transport/http"
-	"github.com/RubenRodrigo/go-tiny-store/internal/domain/category"
-	"github.com/RubenRodrigo/go-tiny-store/internal/domain/product"
-	"github.com/RubenRodrigo/go-tiny-store/internal/domain/user"
 	"github.com/RubenRodrigo/go-tiny-store/internal/platform/api/middleware"
 	"github.com/RubenRodrigo/go-tiny-store/internal/platform/config"
+	authhttp "github.com/RubenRodrigo/go-tiny-store/internal/transport/auth/http"
+	categoryhttp "github.com/RubenRodrigo/go-tiny-store/internal/transport/category/http"
+	producthttp "github.com/RubenRodrigo/go-tiny-store/internal/transport/product/http"
+	userhttp "github.com/RubenRodrigo/go-tiny-store/internal/transport/user/http"
 	"github.com/RubenRodrigo/go-tiny-store/pkg/jwt"
 	"github.com/RubenRodrigo/go-tiny-store/pkg/service"
 	"github.com/gorilla/mux"
@@ -36,10 +37,10 @@ func NewServer(services service.Services, cfg *config.ServerConfig, jwtManager *
 }
 
 func (s *Server) setupRoutes() {
-	auth_handler := authhttp.NewAuthHandler(s.services.Auth)
-	user_handler := user.NewUserHandler(*s.services.User)
-	category_handler := category.NewCategoryHandler(*s.services.Category)
-	product_handler := product.NewProductHandler(*s.services.Product)
+	auth_handler := authhttp.NewAuthHandler(*s.services.Auth)
+	user_handler := userhttp.NewUserHandler(*s.services.User)
+	category_handler := categoryhttp.NewCategoryHandler(*s.services.Category)
+	product_handler := producthttp.NewProductHandler(*s.services.Product)
 
 	r := mux.NewRouter()
 

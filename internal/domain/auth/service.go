@@ -10,25 +10,19 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type authService struct {
+type Service struct {
 	userRepo   user.Repository
 	jwtManager *jwt.JWTManager
 }
 
-type Service interface {
-	RegisterUser(email, username, password, firstName, lastName string) (*user.User, error)
-	LoginUser(email, password string) (*user.User, string, error)
-	LogOutUser(token string) error
-}
-
-func NewService(userRepo user.Repository, jwtManager *jwt.JWTManager) Service {
-	return &authService{
+func NewService(userRepo user.Repository, jwtManager *jwt.JWTManager) *Service {
+	return &Service{
 		userRepo:   userRepo,
 		jwtManager: jwtManager,
 	}
 }
 
-func (s *authService) RegisterUser(email, username, password, firstName, lastName string) (*user.User, error) {
+func (s *Service) RegisterUser(email, username, password, firstName, lastName string) (*user.User, error) {
 	// Check if user with email already exists
 	existingUser, err := s.userRepo.GetUserByEmail(email)
 	if err != nil {
@@ -66,7 +60,7 @@ func (s *authService) RegisterUser(email, username, password, firstName, lastNam
 	return user, nil
 }
 
-func (s *authService) LoginUser(email, password string) (*user.User, string, error) {
+func (s *Service) LoginUser(email, password string) (*user.User, string, error) {
 	// Check if user with email already exists
 	user, err := s.userRepo.GetUserByEmail(email)
 	if err != nil {
@@ -92,7 +86,7 @@ func (s *authService) LoginUser(email, password string) (*user.User, string, err
 	return user, token, nil
 }
 
-// LogOutUser implements AuthService.
-func (s *authService) LogOutUser(token string) error {
+// LogOutUser implements Service.
+func (s *Service) LogOutUser(token string) error {
 	return nil
 }

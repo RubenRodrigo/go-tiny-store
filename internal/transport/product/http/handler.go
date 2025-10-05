@@ -1,17 +1,18 @@
-package product
+package producthttp
 
 import (
 	"net/http"
 
+	"github.com/RubenRodrigo/go-tiny-store/internal/domain/product"
 	"github.com/RubenRodrigo/go-tiny-store/internal/platform/api/middleware"
 )
 
 type ProductHandler struct {
-	productService Service
+	productService product.Service
 	ErrorHandler   middleware.ErrorHandlerFunc
 }
 
-func NewProductHandler(productService Service) *ProductHandler {
+func NewProductHandler(productService product.Service) *ProductHandler {
 	return &ProductHandler{
 		productService: productService,
 		ErrorHandler:   middleware.DefaultErrorHandler,

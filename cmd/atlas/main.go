@@ -6,10 +6,11 @@ import (
 	"os"
 
 	"ariga.io/atlas-provider-gorm/gormschema"
-	"github.com/RubenRodrigo/go-tiny-store/internal/models"
+	"github.com/RubenRodrigo/go-tiny-store/pkg/models"
 )
 
 func main() {
+
 	stmts, err := gormschema.New("postgres").Load(
 		models.AllModels()...,
 	)

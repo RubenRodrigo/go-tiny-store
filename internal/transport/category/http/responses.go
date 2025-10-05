@@ -1,8 +1,8 @@
-package product
+package categoryhttp
 
 import "time"
 
-type ProductResponse struct {
+type CategoryResponse struct {
 	ID        string    `json:"id"`
 	Name      string    `json:"name"`
 	CreatedAt time.Time `json:"created_at"`

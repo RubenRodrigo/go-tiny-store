@@ -1,9 +1,10 @@
-package category
+package categoryhttp
 
 import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/RubenRodrigo/go-tiny-store/internal/domain/category"
 	"github.com/RubenRodrigo/go-tiny-store/internal/platform/api/httputil"
 	"github.com/RubenRodrigo/go-tiny-store/internal/platform/api/middleware"
 	"github.com/RubenRodrigo/go-tiny-store/pkg/apperrors"
@@ -12,11 +13,11 @@ import (
 )
 
 type CategoryHandler struct {
-	categoryService Service
+	categoryService category.Service
 	ErrorHandler    middleware.ErrorHandlerFunc
 }
 
-func NewCategoryHandler(categoryService Service) *CategoryHandler {
+func NewCategoryHandler(categoryService category.Service) *CategoryHandler {
 	return &CategoryHandler{
 		categoryService: categoryService,
 		ErrorHandler:    middleware.DefaultErrorHandler,

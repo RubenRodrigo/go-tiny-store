@@ -1,19 +1,20 @@
-package user
+package userhttp
 
 import (
 	"net/http"
 
+	"github.com/RubenRodrigo/go-tiny-store/internal/domain/user"
 	"github.com/RubenRodrigo/go-tiny-store/internal/platform/api/httputil"
 	"github.com/RubenRodrigo/go-tiny-store/internal/platform/api/middleware"
 	"github.com/gorilla/mux"
 )
 
 type UserHandler struct {
-	userService  Service
+	userService  user.Service
 	ErrorHandler middleware.ErrorHandlerFunc
 }
 
-func NewUserHandler(userService Service) *UserHandler {
+func NewUserHandler(userService user.Service) *UserHandler {
 	return &UserHandler{
 		userService:  userService,
 		ErrorHandler: middleware.DefaultErrorHandler,
