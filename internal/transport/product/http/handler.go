@@ -23,3 +23,28 @@ func (h *ProductHandler) Create(w http.ResponseWriter, r *http.Request) error {
 
 	return nil
 }
+
+func (h *ProductHandler) List(w http.ResponseWriter, r *http.Request) error {
+
+	return nil
+}
+
+func (h *ProductHandler) Get(w http.ResponseWriter, r *http.Request) error {
+
+	return nil
+}
+
+func (h *ProductHandler) Update(w http.ResponseWriter, r *http.Request) error {
+
+	return nil
+}
+
+func (h *ProductHandler) Disable(w http.ResponseWriter, r *http.Request) error {
+
+	return nil
+}
+
+func (h *ProductHandler) Like(w http.ResponseWriter, r *http.Request) error {
+
+	return nil
+}

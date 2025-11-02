@@ -70,7 +70,7 @@ func (h *AuthHandler) LoginUser(w http.ResponseWriter, r *http.Request) error {
 		return validationErrors
 	}
 
-	user, token, err := h.authService.LoginUser(
+	user, accessToken, refreshToken, err := h.authService.LoginUser(
 		req.Email,
 		req.Password,
 	)
@@ -79,12 +79,13 @@ func (h *AuthHandler) LoginUser(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	resp := LoginUserResponse{
-		Token:     token,
-		ID:        user.ID,
-		Email:     user.Email,
-		Username:  user.Username,
-		FirstName: user.FirstName,
-		LastName:  user.LastName,
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+		ID:           user.ID,
+		Email:        user.Email,
+		Username:     user.Username,
+		FirstName:    user.FirstName,
+		LastName:     user.LastName,
 	}
 
 	httputil.RespondWithJSON(w, http.StatusOK, resp)
@@ -92,7 +93,40 @@ func (h *AuthHandler) LoginUser(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-// TODO: Pending to implement
+func (h *AuthHandler) RefreshToken(w http.ResponseWriter, r *http.Request) error {
+	var req LoginUserRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		return apperrors.ErrRequestInvalidBody
+	}
+
+	// Validate the request
+	if validationErrors := validation.Validate(req); len(validationErrors.Errors) > 0 {
+		return validationErrors
+	}
+
+	user, accessToken, refreshToken, err := h.authService.LoginUser(
+		req.Email,
+		req.Password,
+	)
+	if err != nil {
+		return err
+	}
+
+	resp := LoginUserResponse{
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+		ID:           user.ID,
+		Email:        user.Email,
+		Username:     user.Username,
+		FirstName:    user.FirstName,
+		LastName:     user.LastName,
+	}
+
+	httputil.RespondWithJSON(w, http.StatusOK, resp)
+
+	return nil
+}
+
 func (h *AuthHandler) LogOutUser(w http.ResponseWriter, r *http.Request) error {
 	var req LogOutUserRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {

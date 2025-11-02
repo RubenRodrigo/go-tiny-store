@@ -44,7 +44,6 @@ func (s *Service) Update(name, id string) (*Category, error) {
 
 // Delete implements CategoryService.
 func (s *Service) Delete(id string) error {
-
 	if err := s.repository.Delete(id); err != nil {
 		return err
 	}

@@ -77,7 +77,7 @@ func (r *repository) Create(category *Category) error {
 			return apperrors.ErrDuplicateEntry
 		}
 
-		log.Printf("ERROR: Failed to update category in database. Name: %s, Error: %v",
+		log.Printf("ERROR: Failed to create category in database. Name: %s, Error: %v",
 			category.Name, err)
 
 		return apperrors.ErrDatabaseError

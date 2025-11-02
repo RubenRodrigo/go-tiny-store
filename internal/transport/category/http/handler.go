@@ -84,6 +84,28 @@ func (h *CategoryHandler) Update(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
+func (h *CategoryHandler) Get(w http.ResponseWriter, r *http.Request) error {
+	categories, err := h.categoryService.List()
+
+	if err != nil {
+		return err
+	}
+
+	resp := make([]CategoryResponse, len(categories))
+	for i, category := range categories {
+		resp[i] = CategoryResponse{
+			ID:        category.ID,
+			Name:      category.Name,
+			CreatedAt: category.CreatedAt,
+			UpdatedAt: category.UpdatedAt,
+		}
+	}
+
+	httputil.RespondWithJSON(w, http.StatusOK, resp)
+
+	return nil
+}
+
 func (h *CategoryHandler) List(w http.ResponseWriter, r *http.Request) error {
 	categories, err := h.categoryService.List()
 

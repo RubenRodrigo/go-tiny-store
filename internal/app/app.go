@@ -4,10 +4,12 @@ import (
 	"github.com/RubenRodrigo/go-tiny-store/internal/domain/auth"
 	"github.com/RubenRodrigo/go-tiny-store/internal/domain/category"
 	"github.com/RubenRodrigo/go-tiny-store/internal/domain/product"
+	"github.com/RubenRodrigo/go-tiny-store/internal/domain/token"
 	"github.com/RubenRodrigo/go-tiny-store/internal/domain/user"
 	"github.com/RubenRodrigo/go-tiny-store/internal/platform/api"
 	"github.com/RubenRodrigo/go-tiny-store/internal/platform/config"
 	"github.com/RubenRodrigo/go-tiny-store/internal/platform/db"
+	"github.com/RubenRodrigo/go-tiny-store/pkg/consts"
 	"github.com/RubenRodrigo/go-tiny-store/pkg/jwt"
 	"github.com/RubenRodrigo/go-tiny-store/pkg/service"
 )
@@ -33,9 +35,11 @@ func (a *App) Initialize() error {
 	}
 
 	// Initialize Create JWT manager
-	jwtManager := jwt.NewJWTManager([]byte(a.config.Auth.JWT_SECRET))
+	authConfig := consts.NewAuthConfig()
+	jwtManager := jwt.NewJWTManager([]byte(a.config.Auth.JWT_SECRET), authConfig)
 
 	// Initialize repositories
+	tokenRepo := token.NewRepository(database)
 	userRepo := user.NewRepository(database)
 	categoryRepo := category.NewRepository(database)
 	productRepo := product.NewRepository(database)
@@ -43,7 +47,7 @@ func (a *App) Initialize() error {
 	// Initialize services
 	services := service.Services{
 		User:     user.NewService(userRepo),
-		Auth:     auth.NewService(userRepo, jwtManager),
+		Auth:     auth.NewService(userRepo, tokenRepo, jwtManager),
 		Category: category.NewService(categoryRepo),
 		Product:  product.NewService(productRepo),
 	}
