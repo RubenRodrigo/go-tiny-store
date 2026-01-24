@@ -6,8 +6,8 @@ import (
 
 	"net/http"
 
-	"github.com/RubenRodrigo/go-tiny-store/internal/platform/api/middleware"
-	"github.com/RubenRodrigo/go-tiny-store/internal/platform/config"
+	"github.com/RubenRodrigo/go-tiny-store/internal/infraestructure/api/middleware"
+	"github.com/RubenRodrigo/go-tiny-store/internal/infraestructure/config"
 	authhttp "github.com/RubenRodrigo/go-tiny-store/internal/transport/auth/http"
 	carthttp "github.com/RubenRodrigo/go-tiny-store/internal/transport/cart/http"
 	categoryhttp "github.com/RubenRodrigo/go-tiny-store/internal/transport/category/http"
@@ -41,8 +41,8 @@ func NewServer(services service.Services, cfg *config.ServerConfig, jwtManager *
 }
 
 func (s *Server) setupRoutes() {
-	auth_handler := authhttp.NewAuthHandler(*s.services.Auth)
-	user_handler := userhttp.NewUserHandler(*s.services.User)
+	auth_handler := authhttp.NewAuthHandler(s.services.Auth)
+	user_handler := userhttp.NewUserHandler(s.services.User)
 	category_handler := categoryhttp.NewCategoryHandler(*s.services.Category)
 	product_handler := producthttp.NewProductHandler(*s.services.Product)
 	order_handler := orderhttp.NewOrderHandler()
@@ -50,15 +50,21 @@ func (s *Server) setupRoutes() {
 	checkout_handler := checkouthttp.NewHandler()
 	webhook_handler := webhookhttp.NewHandler()
 
-	r := mux.NewRouter()
+	r := s.router
+
+	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("INSIDE API IN /")
+		w.Write([]byte("Hello World! OUTSIDE"))
+	}).Methods("GET")
 
 	// API subrouter
 	api := r.PathPrefix("/api").Subrouter()
 
 	// Status route
 	api.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("INSIDE API")
 		w.Write([]byte("Hello World!"))
-	})
+	}).Methods("GET")
 
 	// Public routes
 	// Auth

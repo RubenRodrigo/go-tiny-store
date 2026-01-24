@@ -8,8 +8,8 @@ import (
 )
 
 type Services struct {
-	User     *user.Service
-	Auth     *auth.Service
+	User     user.Service
+	Auth     auth.Service
 	Category *category.Service
 	Product  *product.Service
 }

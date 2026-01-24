@@ -4,11 +4,11 @@ import (
 	"github.com/RubenRodrigo/go-tiny-store/internal/domain/auth"
 	"github.com/RubenRodrigo/go-tiny-store/internal/domain/category"
 	"github.com/RubenRodrigo/go-tiny-store/internal/domain/product"
-	"github.com/RubenRodrigo/go-tiny-store/internal/domain/token"
 	"github.com/RubenRodrigo/go-tiny-store/internal/domain/user"
-	"github.com/RubenRodrigo/go-tiny-store/internal/platform/api"
-	"github.com/RubenRodrigo/go-tiny-store/internal/platform/config"
-	"github.com/RubenRodrigo/go-tiny-store/internal/platform/db"
+	authadapter "github.com/RubenRodrigo/go-tiny-store/internal/domain/user/adapters/auth"
+	"github.com/RubenRodrigo/go-tiny-store/internal/infraestructure/api"
+	"github.com/RubenRodrigo/go-tiny-store/internal/infraestructure/config"
+	"github.com/RubenRodrigo/go-tiny-store/internal/infraestructure/db"
 	"github.com/RubenRodrigo/go-tiny-store/pkg/consts"
 	"github.com/RubenRodrigo/go-tiny-store/pkg/jwt"
 	"github.com/RubenRodrigo/go-tiny-store/pkg/service"
@@ -39,17 +39,27 @@ func (a *App) Initialize() error {
 	jwtManager := jwt.NewJWTManager([]byte(a.config.Auth.JWT_SECRET), authConfig)
 
 	// Initialize repositories
-	tokenRepo := token.NewRepository(database)
 	userRepo := user.NewRepository(database)
 	categoryRepo := category.NewRepository(database)
 	productRepo := product.NewRepository(database)
 
 	// Initialize services
+	userService := user.NewService(userRepo)
+	categoryService := category.NewService(categoryRepo)
+	productService := product.NewService(productRepo)
+
+	// Initialize adapters
+	userAuthAdapter := authadapter.NewAdapter(userService)
+
+	// Initialize compose services
+	authService := auth.NewService(userAuthAdapter, jwtManager)
+
+	// Initialize services
 	services := service.Services{
-		User:     user.NewService(userRepo),
-		Auth:     auth.NewService(userRepo, tokenRepo, jwtManager),
-		Category: category.NewService(categoryRepo),
-		Product:  product.NewService(productRepo),
+		User:     userService,
+		Auth:     authService,
+		Category: categoryService,
+		Product:  productService,
 	}
 
 	// Initialize REST server

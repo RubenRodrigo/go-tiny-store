@@ -4,7 +4,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/RubenRodrigo/go-tiny-store/internal/platform/api/httputil"
+	"github.com/RubenRodrigo/go-tiny-store/internal/infraestructure/api/httputil"
 	"github.com/RubenRodrigo/go-tiny-store/pkg/apperrors"
 )
 

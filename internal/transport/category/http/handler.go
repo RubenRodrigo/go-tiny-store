@@ -5,8 +5,8 @@ import (
 	"net/http"
 
 	"github.com/RubenRodrigo/go-tiny-store/internal/domain/category"
-	"github.com/RubenRodrigo/go-tiny-store/internal/platform/api/httputil"
-	"github.com/RubenRodrigo/go-tiny-store/internal/platform/api/middleware"
+	"github.com/RubenRodrigo/go-tiny-store/internal/infraestructure/api/httputil"
+	"github.com/RubenRodrigo/go-tiny-store/internal/infraestructure/api/middleware"
 	"github.com/RubenRodrigo/go-tiny-store/pkg/apperrors"
 	"github.com/RubenRodrigo/go-tiny-store/pkg/validation"
 	"github.com/gorilla/mux"

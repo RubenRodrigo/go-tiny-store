@@ -5,8 +5,8 @@ import (
 	"net/http"
 
 	"github.com/RubenRodrigo/go-tiny-store/internal/domain/auth"
-	"github.com/RubenRodrigo/go-tiny-store/internal/platform/api/httputil"
-	"github.com/RubenRodrigo/go-tiny-store/internal/platform/api/middleware"
+	"github.com/RubenRodrigo/go-tiny-store/internal/infraestructure/api/httputil"
+	"github.com/RubenRodrigo/go-tiny-store/internal/infraestructure/api/middleware"
 	"github.com/RubenRodrigo/go-tiny-store/pkg/apperrors"
 	"github.com/RubenRodrigo/go-tiny-store/pkg/validation"
 )
@@ -78,7 +78,7 @@ func (h *AuthHandler) LoginUser(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
-	resp := LoginUserResponse{
+	resp := AuthUserResponse{
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 		ID:           user.ID,
@@ -94,7 +94,7 @@ func (h *AuthHandler) LoginUser(w http.ResponseWriter, r *http.Request) error {
 }
 
 func (h *AuthHandler) RefreshToken(w http.ResponseWriter, r *http.Request) error {
-	var req LoginUserRequest
+	var req RefreshTokenRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		return apperrors.ErrRequestInvalidBody
 	}
@@ -104,15 +104,12 @@ func (h *AuthHandler) RefreshToken(w http.ResponseWriter, r *http.Request) error
 		return validationErrors
 	}
 
-	user, accessToken, refreshToken, err := h.authService.LoginUser(
-		req.Email,
-		req.Password,
-	)
+	user, accessToken, refreshToken, err := h.authService.RefreshToken(req.RefreshToken)
 	if err != nil {
 		return err
 	}
 
-	resp := LoginUserResponse{
+	resp := AuthUserResponse{
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 		ID:           user.ID,

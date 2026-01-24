@@ -5,33 +5,29 @@ import (
 	"log"
 	"time"
 
-	"github.com/RubenRodrigo/go-tiny-store/internal/domain/token"
-	"github.com/RubenRodrigo/go-tiny-store/internal/domain/user"
 	"github.com/RubenRodrigo/go-tiny-store/pkg/apperrors"
 	"github.com/RubenRodrigo/go-tiny-store/pkg/consts"
 	"github.com/RubenRodrigo/go-tiny-store/pkg/jwt"
 	"golang.org/x/crypto/bcrypt"
 )
 
-type Service struct {
-	userRepo   user.Repository
-	tokenRepo  token.Repository
-	jwtManager *jwt.JWTManager
-	authConfig consts.AuthConfig
+type service struct {
+	userService UserServicePort
+	jwtManager  *jwt.JWTManager
+	authConfig  consts.AuthConfig
 }
 
-func NewService(userRepo user.Repository, tokenRepo token.Repository, jwtManager *jwt.JWTManager) *Service {
-	return &Service{
-		userRepo:   userRepo,
-		jwtManager: jwtManager,
-		tokenRepo:  tokenRepo,
-		authConfig: consts.NewAuthConfig(),
+func NewService(userService UserServicePort, jwtManager *jwt.JWTManager) Service {
+	return &service{
+		userService: userService,
+		jwtManager:  jwtManager,
+		authConfig:  consts.NewAuthConfig(),
 	}
 }
 
-func (s *Service) RegisterUser(email, username, password, firstName, lastName string) (*user.User, error) {
+func (s *service) RegisterUser(email, username, password, firstName, lastName string) (*AuthUserDTO, error) {
 	// Check if user with email already exists
-	existingUser, err := s.userRepo.GetUserByEmail(email)
+	existingUser, err := s.userService.GetByEmail(email)
 	if err != nil {
 		if !errors.Is(err, apperrors.ErrNotFound) {
 			return nil, err
@@ -51,24 +47,23 @@ func (s *Service) RegisterUser(email, username, password, firstName, lastName st
 		return nil, err
 	}
 
-	// Create the user
-	user := &user.User{
+	user, err := s.userService.Create(RegisterUserDto{
 		Email:     email,
 		Username:  username,
-		Password:  string(hashedPassword),
 		FirstName: firstName,
 		LastName:  lastName,
-	}
+		Password:  string(hashedPassword),
+	})
 
-	if err := s.userRepo.CreateUser(user); err != nil {
+	if err != nil {
 		return nil, err
 	}
 
 	return user, nil
 }
 
-func (s *Service) Authenticate(email, password string) (*user.User, error) {
-	user, err := s.userRepo.GetUserByEmail(email)
+func (s *service) authenticate(email, password string) (*AuthUserDTO, error) {
+	user, err := s.userService.GetByEmail(email)
 	if err != nil {
 		if errors.Is(err, apperrors.ErrNotFound) {
 			return nil, apperrors.ErrAuthInvalidCredentials
@@ -78,7 +73,7 @@ func (s *Service) Authenticate(email, password string) (*user.User, error) {
 	}
 
 	// Check password
-	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+	err = bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password))
 	if err != nil {
 		return nil, apperrors.ErrAuthInvalidCredentials
 	}
@@ -86,15 +81,15 @@ func (s *Service) Authenticate(email, password string) (*user.User, error) {
 	return user, nil
 }
 
-func (s *Service) LoginUser(email, password string) (*user.User, string, string, error) {
-	// Check if user with email already exists
-	user, err := s.Authenticate(email, password)
+func (s *service) LoginUser(email, password string) (*AuthUserDTO, string, string, error) {
+	// Check if authUser with email already exists
+	authUser, err := s.authenticate(email, password)
 	if err != nil {
 		return nil, "", "", err
 	}
 
 	// Generate JWT token
-	accessToken, err := s.jwtManager.GenerateAccessToken(user.ID, user.Email, user.Username)
+	accessToken, err := s.jwtManager.GenerateAccessToken(authUser.ID, authUser.Email, authUser.Username)
 	if err != nil {
 		return nil, "", "", apperrors.ErrAuthTokenGenerated
 	}
@@ -104,22 +99,55 @@ func (s *Service) LoginUser(email, password string) (*user.User, string, string,
 		return nil, "", "", apperrors.ErrAuthTokenGenerated
 	}
 
-	// Save new refresh token
-	_refreshToken := &token.RefreshToken{
-		Token:     refreshToken,
-		UserID:    user.ID,
-		ExpiresAt: time.Now().Add(s.authConfig.RefreshTokenTTL),
-	}
-	if err := s.tokenRepo.Create(_refreshToken); err != nil {
+	expiresAt := time.Now().Add(s.authConfig.RefreshTokenTTL)
+	if err := s.userService.IssueRefreshToken(expiresAt, authUser.ID, refreshToken); err != nil {
 		return nil, "", "", err
 	}
 
-	return user, accessToken, refreshToken, nil
+	return authUser, accessToken, refreshToken, nil
+}
+
+func (s *service) RefreshToken(token string) (*AuthUserDTO, string, string, error) {
+	// Check if authUser with email already exists
+	claims, err := s.jwtManager.ValidateToken(token)
+	if err != nil {
+		return nil, "", "", err
+	}
+
+	userId, err := jwt.ExtractStringClaim(claims, "user_id")
+	if err != nil {
+		return nil, "", "", apperrors.ErrAuthTokenInvalid
+	}
+
+	authUser, err := s.userService.GetById(userId)
+	if err != nil {
+		return nil, "", "", apperrors.ErrNotFound
+	}
+
+	// TODO: Delete Previous refresh_token
+
+	// Generate JWT token
+	accessToken, err := s.jwtManager.GenerateAccessToken(authUser.ID, authUser.Email, authUser.Username)
+	if err != nil {
+		return nil, "", "", apperrors.ErrAuthTokenGenerated
+	}
+
+	refreshToken, err := s.jwtManager.GenerateRefreshToken()
+	if err != nil {
+		return nil, "", "", apperrors.ErrAuthTokenGenerated
+	}
+
+	expiresAt := time.Now().Add(s.authConfig.RefreshTokenTTL)
+	if err := s.userService.IssueRefreshToken(expiresAt, authUser.ID, refreshToken); err != nil {
+		return nil, "", "", err
+	}
+
+	return authUser, accessToken, refreshToken, nil
 }
 
 // LogOutUser implements Service.
-func (s *Service) LogOutUser(token string) error {
-	if err := s.tokenRepo.DeleteByToken(token); err != nil {
+func (s *service) LogOutUser(token string) error {
+	if err := s.userService.RevokeToken(token); err != nil {
 		return err
 	}
 

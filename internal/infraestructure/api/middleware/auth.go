@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/RubenRodrigo/go-tiny-store/internal/platform/api/httputil"
+	"github.com/RubenRodrigo/go-tiny-store/internal/infraestructure/api/httputil"
 	"github.com/RubenRodrigo/go-tiny-store/pkg/apperrors"
 	"github.com/RubenRodrigo/go-tiny-store/pkg/jwt"
 )
@@ -53,6 +53,7 @@ func AuthMiddleware(jwtManager *jwt.JWTManager) func(http.Handler) http.Handler 
 			if email, ok := claims["email"].(string); ok {
 				ctx = context.WithValue(r.Context(), "email", email)
 			}
+
 			if username, ok := claims["username"].(string); ok {
 				ctx = context.WithValue(r.Context(), "username", username)
 			}

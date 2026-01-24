@@ -3,7 +3,7 @@ package webhookhttp
 import (
 	"net/http"
 
-	"github.com/RubenRodrigo/go-tiny-store/internal/platform/api/middleware"
+	"github.com/RubenRodrigo/go-tiny-store/internal/infraestructure/api/middleware"
 )
 
 type WebhookHandler struct {

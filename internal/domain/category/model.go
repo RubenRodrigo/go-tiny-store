@@ -2,7 +2,7 @@ package category
 
 import (
 	"github.com/RubenRodrigo/go-tiny-store/internal/domain/product"
-	"github.com/RubenRodrigo/go-tiny-store/internal/platform/db"
+	"github.com/RubenRodrigo/go-tiny-store/internal/infraestructure/db"
 )
 
 type Category struct {

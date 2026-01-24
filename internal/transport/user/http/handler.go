@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/RubenRodrigo/go-tiny-store/internal/domain/user"
-	"github.com/RubenRodrigo/go-tiny-store/internal/platform/api/httputil"
-	"github.com/RubenRodrigo/go-tiny-store/internal/platform/api/middleware"
+	"github.com/RubenRodrigo/go-tiny-store/internal/infraestructure/api/httputil"
+	"github.com/RubenRodrigo/go-tiny-store/internal/infraestructure/api/middleware"
 	"github.com/gorilla/mux"
 )
 
@@ -25,7 +25,7 @@ func (h *UserHandler) GetUser(w http.ResponseWriter, r *http.Request) error {
 	params := mux.Vars(r)
 	id := params["id"]
 
-	user, err := h.userService.GetUserByID(id)
+	user, err := h.userService.GetById(id)
 	if err != nil {
 		return err
 	}

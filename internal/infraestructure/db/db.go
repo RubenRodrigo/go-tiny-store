@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/RubenRodrigo/go-tiny-store/internal/platform/config"
+	"github.com/RubenRodrigo/go-tiny-store/internal/infraestructure/config"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )

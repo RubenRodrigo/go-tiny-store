@@ -3,18 +3,16 @@ package models
 import (
 	"github.com/RubenRodrigo/go-tiny-store/internal/domain/category"
 	"github.com/RubenRodrigo/go-tiny-store/internal/domain/product"
-	"github.com/RubenRodrigo/go-tiny-store/internal/domain/product_image"
-	"github.com/RubenRodrigo/go-tiny-store/internal/domain/token"
 	"github.com/RubenRodrigo/go-tiny-store/internal/domain/user"
 )
 
 // AllModels returns all models for schema generation.
 func AllModels() []interface{} {
 	return []interface{}{
-		&token.RefreshToken{},
 		&user.User{},
+		&user.RefreshToken{},
 		&category.Category{},
 		&product.Product{},
-		&product_image.ProductImage{},
+		&product.ProductImage{},
 	}
 }

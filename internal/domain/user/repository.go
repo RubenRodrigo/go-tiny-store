@@ -18,6 +18,8 @@ type Repository interface {
 	GetUserById(id string) (*User, error)
 	GetUserByEmail(email string) (*User, error)
 	ListUsers() ([]*User, error)
+	SaveToken(rt *RefreshToken) error
+	DeleteToken(token string) error
 }
 
 func NewRepository(db *gorm.DB) Repository {
@@ -84,4 +86,12 @@ func (r *repository) ListUsers() ([]*User, error) {
 	}
 
 	return users, nil
+}
+
+func (r *repository) SaveToken(rt *RefreshToken) error {
+	return r.db.Create(rt).Error
+}
+
+func (r *repository) DeleteToken(token string) error {
+	return r.db.Delete(&RefreshToken{}, "token = ?", token).Error
 }

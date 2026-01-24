@@ -8,7 +8,7 @@ type RegisterUserResponse struct {
 	LastName  string `json:"last_name"`
 }
 
-type LoginUserResponse struct {
+type AuthUserResponse struct {
 	AccessToken  string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`
 	ID           string `json:"id"`
