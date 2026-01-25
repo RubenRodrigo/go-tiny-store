@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"ariga.io/atlas-provider-gorm/gormschema"
-	"github.com/RubenRodrigo/go-tiny-store/pkg/models"
+	"github.com/RubenRodrigo/go-tiny-store/internal/domain/models"
 )
 
 func main() {

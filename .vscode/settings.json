@@ -1,5 +1,13 @@
 {
-	"cSpell.words": [
-		"gorm"
-	]
+  "cSpell.words": [
+    "authhttp",
+    "carthttp",
+    "categoryhttp",
+    "checkouthttp",
+    "gorm",
+    "httputils",
+    "orderhttp",
+    "producthttp",
+    "userhttp"
+  ]
 }
