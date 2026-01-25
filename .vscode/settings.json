@@ -8,6 +8,7 @@
     "httputils",
     "orderhttp",
     "producthttp",
+    "Sendgrid",
     "userhttp"
   ]
 }

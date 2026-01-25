@@ -19,13 +19,13 @@ func NewAuthHandler(authService auth.Service) *Handler {
 	}
 }
 
-func (h *Handler) RegisterUser(w http.ResponseWriter, r *http.Request) error {
-	var req RegisterUserRequest
+func (h *Handler) SignUp(w http.ResponseWriter, r *http.Request) error {
+	var req SignUpRequest
 	if err := validation.DecodeAndValidate(r, &req); err != nil {
 		return err
 	}
 
-	user, err := h.authService.RegisterUser(
+	user, err := h.authService.SignUp(
 		req.Email,
 		req.Username,
 		req.Password,
@@ -37,12 +37,14 @@ func (h *Handler) RegisterUser(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
-	resp := RegisterUserResponse{
-		ID:        user.ID,
-		Email:     user.Email,
-		Username:  user.Username,
-		FirstName: user.FirstName,
-		LastName:  user.LastName,
+	resp := AuthUserResponse{
+		AccessToken:  user.AccessToken,
+		RefreshToken: user.RefreshToken,
+		ID:           user.ID,
+		Email:        user.Email,
+		Username:     user.Username,
+		FirstName:    user.FirstName,
+		LastName:     user.LastName,
 	}
 
 	httputil.RespondWithJSON(w, http.StatusOK, resp)
@@ -50,13 +52,13 @@ func (h *Handler) RegisterUser(w http.ResponseWriter, r *http.Request) error {
 
 }
 
-func (h *Handler) LoginUser(w http.ResponseWriter, r *http.Request) error {
-	var req LoginUserRequest
+func (h *Handler) SignIn(w http.ResponseWriter, r *http.Request) error {
+	var req SignInRequest
 	if err := validation.DecodeAndValidate(r, &req); err != nil {
 		return err
 	}
 
-	user, accessToken, refreshToken, err := h.authService.LoginUser(
+	user, err := h.authService.SignIn(
 		req.Email,
 		req.Password,
 	)
@@ -65,8 +67,8 @@ func (h *Handler) LoginUser(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	resp := AuthUserResponse{
-		AccessToken:  accessToken,
-		RefreshToken: refreshToken,
+		AccessToken:  user.AccessToken,
+		RefreshToken: user.RefreshToken,
 		ID:           user.ID,
 		Email:        user.Email,
 		Username:     user.Username,
@@ -84,14 +86,14 @@ func (h *Handler) RefreshToken(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
-	user, accessToken, refreshToken, err := h.authService.RefreshToken(req.RefreshToken)
+	user, err := h.authService.RefreshToken(req.RefreshToken)
 	if err != nil {
 		return err
 	}
 
 	resp := AuthUserResponse{
-		AccessToken:  accessToken,
-		RefreshToken: refreshToken,
+		AccessToken:  user.AccessToken,
+		RefreshToken: user.RefreshToken,
 		ID:           user.ID,
 		Email:        user.Email,
 		Username:     user.Username,
@@ -104,8 +106,8 @@ func (h *Handler) RefreshToken(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-func (h *Handler) LogOutUser(w http.ResponseWriter, r *http.Request) error {
-	var req LogOutUserRequest
+func (h *Handler) SignOut(w http.ResponseWriter, r *http.Request) error {
+	var req SignOutRequest
 	if err := validation.DecodeAndValidate(r, &req); err != nil {
 		return err
 	}
@@ -115,7 +117,7 @@ func (h *Handler) LogOutUser(w http.ResponseWriter, r *http.Request) error {
 		return validationErrors
 	}
 
-	err := h.authService.LogOutUser(
+	err := h.authService.SignOut(
 		req.Token,
 	)
 
@@ -129,9 +131,50 @@ func (h *Handler) LogOutUser(w http.ResponseWriter, r *http.Request) error {
 }
 
 func (h *Handler) ForgotPassword(w http.ResponseWriter, r *http.Request) error {
+	var req ForgotPasswordRequest
+	if err := validation.DecodeAndValidate(r, &req); err != nil {
+		return err
+	}
+
+	// Validate the request
+	if validationErrors := validation.Validate(req); len(validationErrors.Errors) > 0 {
+		return validationErrors
+	}
+
+	err := h.authService.ForgotPassword(
+		req.Email,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	httputil.RespondWithJSON(w, http.StatusOK, nil)
+
 	return nil
 }
 
 func (h *Handler) ResetPassword(w http.ResponseWriter, r *http.Request) error {
+	var req ResetPasswordRequest
+	if err := validation.DecodeAndValidate(r, &req); err != nil {
+		return err
+	}
+
+	// Validate the request
+	if validationErrors := validation.Validate(req); len(validationErrors.Errors) > 0 {
+		return validationErrors
+	}
+
+	err := h.authService.ResetPassword(
+		req.Token,
+		req.Password,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	httputil.RespondWithJSON(w, http.StatusOK, nil)
+
 	return nil
 }

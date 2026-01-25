@@ -43,6 +43,7 @@ var (
 	ErrAuthTokenInvalid        = New("INVALID_TOKEN", "Invalid authentication token", http.StatusUnauthorized)
 	ErrAuthMissingToken        = New("MISSING_TOKEN", "Missing authorization token", http.StatusUnauthorized)
 	ErrAuthInvalidTokenFormat  = New("INVALID_TOKEN_FORMAT", "Invalid token format", http.StatusUnauthorized)
+	ErrAuthInvalidResetToken   = New("INVALID_RESET_TOKEN", "Invalid reset token", http.StatusUnauthorized)
 	ErrAuthTokenExpired        = New("TOKEN_EXPIRED", "Authentication token expired", http.StatusUnauthorized)
 	ErrInsufficientPermissions = New("INSUFFICIENT_PERMISSIONS", "You do not have permission to perform this action", http.StatusForbidden)
 )

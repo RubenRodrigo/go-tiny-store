@@ -14,6 +14,11 @@ func Validate(val interface{}) *apperrors.ValidationErrors {
 	validationErrors := apperrors.NewValidationError()
 
 	v := reflect.ValueOf(val)
+	// 👇 THIS IS THE FIX
+	if v.Kind() == reflect.Ptr {
+		v = v.Elem()
+	}
+
 	t := v.Type()
 
 	for i := 0; i < v.NumField(); i++ {

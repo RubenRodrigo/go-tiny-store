@@ -88,8 +88,8 @@ func (s *Server) initializeHandlers() *Handlers {
 func (s *Server) setupPublicRoutes(api *mux.Router, h *Handlers) {
 	// Auth routes
 	auth := api.PathPrefix("/auth").Subrouter()
-	auth.HandleFunc("/register", s.handle(h.Auth.RegisterUser)).Methods("POST")
-	auth.HandleFunc("/login", s.handle(h.Auth.LoginUser)).Methods("POST")
+	auth.HandleFunc("/sign-up", s.handle(h.Auth.SignUp)).Methods("POST")
+	auth.HandleFunc("/sign-in", s.handle(h.Auth.SignIn)).Methods("POST")
 	auth.HandleFunc("/refresh", s.handle(h.Auth.RefreshToken)).Methods("POST")
 	auth.HandleFunc("/forgot-password", s.handle(h.Auth.ForgotPassword)).Methods("POST")
 	auth.HandleFunc("/reset-password", s.handle(h.Auth.ResetPassword)).Methods("POST")

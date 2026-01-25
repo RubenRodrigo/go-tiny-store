@@ -5,6 +5,7 @@ func AllModels() []interface{} {
 	return []interface{}{
 		&User{},
 		&RefreshToken{},
+		&PasswordResetToken{},
 		&Category{},
 		&Product{},
 		&ProductImage{},

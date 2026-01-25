@@ -16,7 +16,10 @@ type User interface {
 	ListUsers() ([]*models.User, error)
 	SaveToken(rt *models.RefreshToken) error
 	DeleteToken(token string) error
+	GetRefreshToken(token string) (*models.RefreshToken, error)
+	DeleteTokens(userId string) error
 	UpdateUser(user *models.User) error
+	UpdateUserPassword(userId, newHashedPassword string) error
 }
 
 type userRepo struct {
@@ -87,6 +90,26 @@ func (r *userRepo) UpdateUser(user *models.User) error {
 	return nil
 }
 
+func (r *userRepo) UpdateUserPassword(userId, newHashedPassword string) error {
+	err := r.db.Model(&models.User{}).Where("id = ?", userId).Update("password", newHashedPassword)
+	if err.Error != nil {
+		return apperrors.ErrDatabaseError
+	}
+
+	return nil
+}
+
+func (r *userRepo) GetRefreshToken(token string) (*models.RefreshToken, error) {
+	var prt models.RefreshToken
+	if err := r.db.Where("token = ?", token).First(&prt).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, apperrors.ErrNotFound
+		}
+		return nil, apperrors.ErrDatabaseError
+	}
+	return &prt, nil
+}
+
 func (r *userRepo) SaveToken(rt *models.RefreshToken) error {
 	if err := r.db.Create(rt).Error; err != nil {
 		return apperrors.ErrDatabaseError
@@ -95,11 +118,17 @@ func (r *userRepo) SaveToken(rt *models.RefreshToken) error {
 }
 
 func (r *userRepo) DeleteToken(token string) error {
-	// Use Delete with Where to avoid "WHERE conditions required" error
 	result := r.db.Where("token = ?", token).Delete(&models.RefreshToken{})
 	if result.Error != nil {
 		return apperrors.ErrDatabaseError
 	}
-	// Note: If no rows affected, that's OK (token already deleted or never existed)
+	return nil
+}
+
+func (r *userRepo) DeleteTokens(userId string) error {
+	result := r.db.Where("user_id = ?", userId).Delete(&models.RefreshToken{})
+	if result.Error != nil {
+		return apperrors.ErrDatabaseError
+	}
 	return nil
 }

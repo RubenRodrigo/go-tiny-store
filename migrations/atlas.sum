@@ -1,3 +1,6 @@
-h1:6L993Mw6a9KMdn/mmrMf66wJjFsX+DvmrID0HxqeM3c=
+h1:szjU+1xXSNu06qEu5PPT9qqRvBy8RHohb8zXKVlRQrQ=
 20250817061428_initial.sql h1:haMbgutjCb6iCfwvCkFpPzSqC3xzb1JvTC+0NydKUEo=
 20251005065637_add_refresh_token.sql h1:sorPvGXp2dsH+6rLejnR9ml0CxtYJc8j3vwtu/CZWGA=
+20260125192727_add_reset_token.sql h1:OadLJKrY3iTsHoooNjIk15MevBXFO4O/JY5qt6aoFQU=
+20260125192803_add_reset_token_model.sql h1:l/HgpEmUblaDPyMQd9nBfaKxhiu8XtDwoWtEHhTj9WE=
+20260125193824_remove_deleted_at_from_tokens.sql h1:kN1o3cl/dC6zqn0vHrdGeyybMftkBVeR9W7K8AvGEo0=

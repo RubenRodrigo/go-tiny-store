@@ -6,6 +6,7 @@ import (
 	"github.com/RubenRodrigo/go-tiny-store/internal/application"
 	"github.com/RubenRodrigo/go-tiny-store/internal/application/auth"
 	"github.com/RubenRodrigo/go-tiny-store/internal/application/category"
+	"github.com/RubenRodrigo/go-tiny-store/internal/application/integrations"
 	"github.com/RubenRodrigo/go-tiny-store/internal/application/product"
 	"github.com/RubenRodrigo/go-tiny-store/internal/application/user"
 	"github.com/RubenRodrigo/go-tiny-store/internal/domain/repository"
@@ -13,6 +14,7 @@ import (
 	infraAuth "github.com/RubenRodrigo/go-tiny-store/internal/infrastructure/auth"
 	"github.com/RubenRodrigo/go-tiny-store/internal/infrastructure/config"
 	"github.com/RubenRodrigo/go-tiny-store/internal/infrastructure/db"
+	"github.com/RubenRodrigo/go-tiny-store/internal/infrastructure/email"
 )
 
 type App struct {
@@ -45,14 +47,24 @@ func (a *App) Initialize() error {
 
 	// Initialize repositories
 	userRepo := repository.NewUserRepository(db)
+	passwordResetTokenRepo := repository.NewPasswordResetTokenRepository(db)
 	categoryRepo := repository.NewCategoryRepository(db)
 	productRepo := repository.NewProductRepository(db)
+
+	// Initialize ports
+	emailSender := email.NewSendgridManager(email.SendgridConfig{
+		APIKey:    "key",
+		FromEmail: "admin@admin.com",
+	})
+
+	// Initialize integrations
+	emailService := integrations.NewEmailService(emailSender)
 
 	// Initialize services
 	userService := user.NewService(userRepo)
 	categoryService := category.NewService(categoryRepo)
 	productService := product.NewService(productRepo)
-	authService := auth.NewService(userRepo, tokenService)
+	authService := auth.NewService(userRepo, passwordResetTokenRepo, tokenService, emailService)
 
 	// Initialize services
 	services := application.Services{

@@ -1,6 +1,6 @@
 package authhttp
 
-type RegisterUserRequest struct {
+type SignUpRequest struct {
 	Email     string `json:"email" validate:"required,email"`
 	Username  string `json:"username" validate:"min=3,max=30"`
 	Password  string `json:"password"  validate:"required,min=8,max=30"`
@@ -8,15 +8,24 @@ type RegisterUserRequest struct {
 	LastName  string `json:"last_name" validate:"min=2"`
 }
 
-type LoginUserRequest struct {
+type SignInRequest struct {
 	Email    string `json:"email" validate:"required,email"`
 	Password string `json:"password" validate:"required"`
 }
 
-type LogOutUserRequest struct {
+type SignOutRequest struct {
 	Token string `json:"token" validate:"required"`
 }
 
 type RefreshTokenRequest struct {
-	RefreshToken string `json:"string" validate:"required"`
+	RefreshToken string `json:"refresh_token" validate:"required"`
+}
+
+type ForgotPasswordRequest struct {
+	Email string `json:"email" validate:"required"`
+}
+
+type ResetPasswordRequest struct {
+	Token    string `json:"token" validate:"required"`
+	Password string `json:"password" validate:"required"`
 }

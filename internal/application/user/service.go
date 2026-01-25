@@ -1,9 +1,6 @@
 package user
 
 import (
-	"fmt"
-	"time"
-
 	"github.com/RubenRodrigo/go-tiny-store/internal/domain/models"
 	"github.com/RubenRodrigo/go-tiny-store/internal/domain/repository"
 )
@@ -60,25 +57,4 @@ func (s *Service) ListUsers() ([]*models.User, error) {
 	}
 
 	return users, nil
-}
-
-func (s *Service) IssueRefreshToken(time time.Time, userID, tokenString string) (*models.RefreshToken, error) {
-	token := &models.RefreshToken{
-		ExpiresAt: time,
-		Token:     tokenString,
-		UserID:    userID,
-	}
-
-	fmt.Println(token)
-
-	err := s.repo.SaveToken(token)
-	if err != nil {
-		return nil, err
-	}
-
-	return token, err
-}
-
-func (s *Service) RevokeToken(tokenString string) error {
-	return s.repo.DeleteToken(tokenString)
 }
