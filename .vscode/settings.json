@@ -5,6 +5,7 @@
     "categoryhttp",
     "checkouthttp",
     "gorm",
+    "gormadapter",
     "httputils",
     "orderhttp",
     "producthttp",

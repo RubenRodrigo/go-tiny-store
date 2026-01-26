@@ -6,13 +6,12 @@ import (
 	"os"
 
 	"ariga.io/atlas-provider-gorm/gormschema"
-	"github.com/RubenRodrigo/go-tiny-store/internal/domain/models"
+	gormadapter "github.com/RubenRodrigo/go-tiny-store/internal/adapters/persistence/gorm"
 )
 
 func main() {
-
 	stmts, err := gormschema.New("postgres").Load(
-		models.AllModels()...,
+		gormadapter.AllModels()...,
 	)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "failed to load gorm schema: %v\n", err)
