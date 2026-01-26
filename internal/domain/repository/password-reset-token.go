@@ -48,6 +48,7 @@ func (r *passwordResetTokenRepo) MarkTokenAsUsed(token string) error {
 	result := r.db.Model(&models.PasswordResetToken{}).
 		Where("token_hash = ?", token).
 		Update("used_at", time.Now())
+
 	if result.Error != nil {
 		return apperrors.ErrDatabaseError
 	}

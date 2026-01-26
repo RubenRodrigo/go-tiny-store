@@ -77,7 +77,7 @@ func (r *userRepo) ListUsers() ([]*models.User, error) {
 }
 
 func (r *userRepo) UpdateUser(user *models.User) error {
-	if err := r.db.Save(user).Error; err != nil {
+	if err := r.db.Model(&models.User{}).Where("id = ?", user.ID).Updates(user).Error; err != nil {
 		if errors.Is(err, gorm.ErrDuplicatedKey) ||
 			strings.Contains(err.Error(), "duplicate") {
 			if strings.Contains(err.Error(), "email") {

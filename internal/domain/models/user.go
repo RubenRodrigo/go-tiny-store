@@ -15,6 +15,13 @@ type User struct {
 	LastName            string               `json:"last_name"`
 	RefreshTokens       []RefreshToken       `json:"refresh_tokens" gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	PasswordResetTokens []PasswordResetToken `json:"password_reset_tokens" gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	Roles               []Role               `json:"roles" gorm:"many2many:user_roles;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+}
+
+type Role struct {
+	db.Base
+	Name        string `json:"name" gorm:"unique;not null"`
+	Description string `json:"description"`
 }
 
 type RefreshToken struct {
